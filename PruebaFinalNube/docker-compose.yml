@@ -1,0 +1,41 @@
+services:
+  bd:
+    image: mysql:8.0
+    container_name: contenedor_bd
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password123
+      MYSQL_DATABASE: prueba-final-nube
+    volumes:
+      - db_data:/var/lib/mysql            
+      - ./db/initdb.d:/docker-entrypoint-initdb.d 
+    networks:
+      - mi_red
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: ./web
+    container_name: contenedor_web
+    ports:
+      - "3000:3000"
+    networks:
+      - mi_red
+    depends_on:
+      bd:
+        condition: service_healthy 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  db_data:
+
+networks:
+  mi_red:
+    driver: bridge

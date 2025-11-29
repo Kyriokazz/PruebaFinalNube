@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Prueba Final Nube</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; }
+        .logo { width: 150px; margin: 20px; }
+        table { width: 80%; margin: 0 auto; border-collapse: collapse; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; border: 1px solid #ddd; }
+        th { background-color: #333; color: white; }
+        .row-img { width: 40px; height: 40px; object-fit: cover; }
+        .status-ok { color: green; font-weight: bold; }
+        .status-fallo { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <img src="img/STomasLogo.jpg" alt="Logo" class="logo">
+    
+    <h1>Tabla LOG del Sistema</h1>
+    <h3 id="db-status">Estado BD: Conectando...</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Hora</th>
+                <th>Actividad</th>
+                <th>Estado</th>
+                <th>Imagen</th>
+            </tr>
+        </thead>
+        <tbody id="log-table-body">
+            </tbody>
+    </table>
+
+    <script>
+        fetch('/api/logs')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('db-status').innerText = "Estado BD: CONECTADO";
+                document.getElementById('db-status').style.color = "green";
+                
+                const tbody = document.getElementById('log-table-body');
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${row.hora}</td>
+                        <td>${row.actividad}</td>
+                        <td>${row.estado}</td>
+                        <td><img src="img/${row.imagen}" class="row-img" alt="img"></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(err => {
+                document.getElementById('db-status').innerText = "Estado BD: ERROR DE CONEXIÓN";
+                document.getElementById('db-status').style.color = "red";
+            });
+    </script>
+</body>
+</html>
